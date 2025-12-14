@@ -1,0 +1,20 @@
+name = "local-brands-api"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+[vars]
+# Non-sensitive environment variables
+ENVIRONMENT = "development"
+
+# Secrets should be set via: wrangler secret put GEMINI_API_KEY
+# wrangler secret put GITHUB_TOKEN
+# wrangler secret put CLOUDFLARE_API_TOKEN
+
+[dev]
+port = 8787
+local_protocol = "http"
+
+# KV Namespace for storing project data (optional future use)
+# [[kv_namespaces]]
+# binding = "PROJECTS"
+# id = "your-kv-namespace-id"

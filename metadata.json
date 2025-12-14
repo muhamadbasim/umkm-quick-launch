@@ -1,0 +1,7 @@
+{
+  "name": "Local Brands",
+  "description": "Next level execution for local brand landing pages.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "mcpServers": {
+    "exa": {
+      "command": "uvx",
+      "args": ["exa-mcp-server"],
+      "env": {
+        "EXA_API_KEY": "886243ae-0c92-40d3-899b-71d3bfa30bf5"
+      },
+      "disabled": false
+    },
+    "Ref": {
+      "type": "http",
+      "url": "https://api.ref.tools/mcp?apiKey=API_KEY"
+    },
+    "shadcn": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["shadcn@latest", "mcp"],
+      "disabled": false
+    },
+    "supabase": {
+      "type": "http",
+      "url": "https://mcp.supabase.com/mcp?project_ref=${PROJECT_URL}",
+      "headers": {
+        "Authorization": "Bearer ${PERSONAL_ACCESS_TOKEN}"
+      }
+    },
+    "chrome-devtools": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "chrome-devtools-mcp@latest"],
+      "disabled": false
+    },
+    "hugeicons": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@hugeicons/mcp-server"],
+      "disabled": false
+    },
+    "next-devtools": {
+      "command": "npx",
+      "args": ["-y", "next-devtools-mcp@latest"],
+      "disabled": false
+    }
+  }
+}
