@@ -1,9 +1,9 @@
 import { AIAnalysisResult } from "../types";
 
-// Backend API URL - uses relative path in production, absolute in development
+// Backend API URL - uses localhost in development, deployed Worker in production
 const API_BASE_URL = import.meta.env.DEV
   ? 'http://localhost:8787'
-  : '';
+  : 'https://local-brands-api.muhamadbasim.workers.dev';
 
 /**
  * Analyze an image using the backend API (which securely calls Gemini)
