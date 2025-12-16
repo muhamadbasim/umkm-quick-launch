@@ -53,15 +53,71 @@ const CreateProject: React.FC<CreateProjectProps> = ({ initialProject, onSuccess
     }
   }, [initialProject]);
 
-  // -- Step 1: Handle Image Upload --
+  // -- Step 1: Handle Image Upload (auto-triggers AI analysis) --
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImage(reader.result as string);
+        const base64Image = reader.result as string;
+        setImage(base64Image);
+        // Auto-trigger AI analysis after image is loaded
+        triggerAnalysis(base64Image);
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  // Helper function to trigger AI analysis
+  const triggerAnalysis = async (imageData: string) => {
+    setStep('analyzing');
+    try {
+      const result = await analyzeImageForLandingPage(imageData, language);
+      setEditedData(result);
+
+      // If AI suggested a location, use it
+      if (result.locationSuggestion) {
+        setLocation(result.locationSuggestion);
+      }
+
+      // Initialize History
+      setHistory([result]);
+      setHistoryIndex(0);
+
+      setStep('review');
+
+      // Auto-detect location if not already set
+      autoDetectLocation();
+    } catch (error) {
+      alert(t.createProject.failedAnalyze);
+      setStep('upload');
+    }
+  };
+
+  // Auto location detection function
+  const autoDetectLocation = () => {
+    if (location) return; // Skip if location already set
+
+    if (typeof navigator !== 'undefined' && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            const { latitude, longitude } = position.coords;
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`,
+              { headers: { 'User-Agent': 'OCTOmatiz/1.0' } }
+            );
+            const data = await response.json();
+            if (data.display_name && !location) {
+              setLocation(data.display_name);
+            }
+          } catch (error) {
+            console.debug('Auto geocoding failed:', error);
+          }
+        },
+        (error) => console.debug('Auto geolocation skipped:', error.message),
+        { timeout: 10000, enableHighAccuracy: false, maximumAge: 300000 }
+      );
     }
   };
 

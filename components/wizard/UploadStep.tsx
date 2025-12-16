@@ -65,6 +65,7 @@ export const UploadStep: React.FC<UploadStepProps> = ({
                 <input
                     type="file"
                     accept="image/*"
+                    capture="environment"
                     ref={fileInputRef}
                     className="hidden"
                     onChange={onFileChange}
