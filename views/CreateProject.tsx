@@ -53,6 +53,14 @@ const CreateProject: React.FC<CreateProjectProps> = ({ initialProject, onSuccess
     }
   }, [initialProject]);
 
+  // -- Auto-detect location on mount --
+  useEffect(() => {
+    if (!initialProject && !location) {
+      autoDetectLocation();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // -- Step 1: Handle Image Upload (auto-triggers AI analysis) --
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
