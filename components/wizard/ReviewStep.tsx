@@ -9,11 +9,13 @@ interface ReviewStepProps {
     editedData: AIAnalysisResult;
     image: string;
     phoneNumber: string;
+    location: string;
     historyIndex: number;
     historyLength: number;
     onDataChange: (data: AIAnalysisResult) => void;
     onAddToHistory: (data: AIAnalysisResult) => void;
     onPhoneChange: (phone: string) => void;
+    onLocationChange: (location: string) => void;
     onUndo: () => void;
     onRedo: () => void;
     onPublish: () => void;
@@ -24,6 +26,10 @@ interface ReviewStepProps {
         story: string;
         whatsapp: string;
         whatsappHint: string;
+        location: string;
+        locationHint: string;
+        detectLocation: string;
+        detecting: string;
         designStyle: string;
         livePreview: string;
         updatesInstantly: string;
@@ -36,11 +42,13 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
     editedData,
     image,
     phoneNumber,
+    location,
     historyIndex,
     historyLength,
     onDataChange,
     onAddToHistory,
     onPhoneChange,
+    onLocationChange,
     onUndo,
     onRedo,
     onPublish,
@@ -55,11 +63,13 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
                     <ContentEditor
                         editedData={editedData}
                         phoneNumber={phoneNumber}
+                        location={location}
                         historyIndex={historyIndex}
                         historyLength={historyLength}
                         onDataChange={onDataChange}
                         onAddToHistory={onAddToHistory}
                         onPhoneChange={onPhoneChange}
+                        onLocationChange={onLocationChange}
                         onUndo={onUndo}
                         onRedo={onRedo}
                         t={t}

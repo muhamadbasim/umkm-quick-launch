@@ -1,14 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { AIAnalysisResult } from '../../types';
 
 interface ContentEditorProps {
     editedData: AIAnalysisResult;
     phoneNumber: string;
+    location: string;
     historyIndex: number;
     historyLength: number;
     onDataChange: (data: AIAnalysisResult) => void;
     onAddToHistory: (data: AIAnalysisResult) => void;
     onPhoneChange: (phone: string) => void;
+    onLocationChange: (location: string) => void;
     onUndo: () => void;
     onRedo: () => void;
     t: {
@@ -18,21 +20,67 @@ interface ContentEditorProps {
         story: string;
         whatsapp: string;
         whatsappHint: string;
+        location: string;
+        locationHint: string;
+        detectLocation: string;
+        detecting: string;
     };
 }
 
 export const ContentEditor: React.FC<ContentEditorProps> = ({
     editedData,
     phoneNumber,
+    location,
     historyIndex,
     historyLength,
     onDataChange,
     onAddToHistory,
     onPhoneChange,
+    onLocationChange,
     onUndo,
     onRedo,
     t,
 }) => {
+    const [isDetecting, setIsDetecting] = useState(false);
+
+    const detectLocation = () => {
+        if (typeof navigator !== 'undefined' && navigator.geolocation) {
+            setIsDetecting(true);
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    try {
+                        const { latitude, longitude } = position.coords;
+                        const response = await fetch(
+                            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`,
+                            {
+                                headers: {
+                                    'User-Agent': 'OCTOmatiz/1.0'
+                                }
+                            }
+                        );
+                        const data = await response.json();
+                        if (data.display_name) {
+                            onLocationChange(data.display_name);
+                        }
+                    } catch (error) {
+                        console.debug('Geocoding failed:', error);
+                    } finally {
+                        setIsDetecting(false);
+                    }
+                },
+                (error) => {
+                    console.debug('Geolocation error:', error.code, error.message);
+                    setIsDetecting(false);
+                },
+                {
+                    timeout: 15000,
+                    enableHighAccuracy: true,
+                    maximumAge: 0
+                }
+            );
+        }
+    };
+
     return (
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-5 transition-all">
             <div className="flex items-center justify-between mb-4">
@@ -107,6 +155,31 @@ export const ContentEditor: React.FC<ContentEditorProps> = ({
                         onBlur={() => onAddToHistory(editedData)}
                         className="w-full p-3 border border-gray-200 dark:border-gray-700 dark:bg-gray-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none resize-none text-gray-900 dark:text-white"
                     />
+                </div>
+
+                <div>
+                    <label htmlFor="location" className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">
+                        {t.location}
+                    </label>
+                    <div className="flex gap-2">
+                        <input
+                            id="location"
+                            type="text"
+                            placeholder="e.g. Jl. Sudirman No. 123, Jakarta"
+                            value={location}
+                            onChange={(e) => onLocationChange(e.target.value)}
+                            className="flex-1 p-3 border border-gray-200 dark:border-gray-700 dark:bg-gray-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-gray-900 dark:text-white"
+                        />
+                        <button
+                            type="button"
+                            onClick={detectLocation}
+                            disabled={isDetecting}
+                            className="px-4 py-3 bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-300 rounded-xl hover:bg-indigo-200 dark:hover:bg-indigo-800 transition-colors disabled:opacity-50 whitespace-nowrap text-sm font-medium"
+                        >
+                            {isDetecting ? t.detecting : t.detectLocation}
+                        </button>
+                    </div>
+                    <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1">{t.locationHint}</p>
                 </div>
 
                 <div>

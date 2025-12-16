@@ -17,6 +17,7 @@ const CreateProject: React.FC<CreateProjectProps> = ({ initialProject, onSuccess
   const [step, setStep] = useState<WizardStep>('upload');
   const [image, setImage] = useState<string | null>(null);
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [location, setLocation] = useState('');
   const [editedData, setEditedData] = useState<AIAnalysisResult | null>(null);
 
   // Publishing State
@@ -34,6 +35,7 @@ const CreateProject: React.FC<CreateProjectProps> = ({ initialProject, onSuccess
     if (initialProject) {
       setImage(initialProject.imageUrl);
       setPhoneNumber(initialProject.phone);
+      setLocation(initialProject.location || '');
 
       const initialData: AIAnalysisResult = {
         businessNameSuggestion: initialProject.businessName,
@@ -72,6 +74,11 @@ const CreateProject: React.FC<CreateProjectProps> = ({ initialProject, onSuccess
       // Pass the current language to the AI service
       const result = await analyzeImageForLandingPage(image, language);
       setEditedData(result);
+
+      // If AI suggested a location, use it
+      if (result.locationSuggestion && !location) {
+        setLocation(result.locationSuggestion);
+      }
 
       // Initialize History
       setHistory([result]);
@@ -141,6 +148,7 @@ const CreateProject: React.FC<CreateProjectProps> = ({ initialProject, onSuccess
             headline: editedData.headline,
             story: editedData.story,
             phone: phoneNumber,
+            location: location,
             templateId: editedData.suggestedTemplate,
             status: 'published',
             publishedUrl: initialProject?.publishedUrl || `https://${editedData.businessNameSuggestion.toLowerCase().replace(/[^a-z0-9]/g, '-')}.github.io`,
@@ -204,11 +212,13 @@ const CreateProject: React.FC<CreateProjectProps> = ({ initialProject, onSuccess
           editedData={editedData}
           image={image}
           phoneNumber={phoneNumber}
+          location={location}
           historyIndex={historyIndex}
           historyLength={history.length}
           onDataChange={setEditedData}
           onAddToHistory={addToHistory}
           onPhoneChange={setPhoneNumber}
+          onLocationChange={setLocation}
           onUndo={handleUndo}
           onRedo={handleRedo}
           onPublish={handlePublish}
@@ -219,6 +229,10 @@ const CreateProject: React.FC<CreateProjectProps> = ({ initialProject, onSuccess
             story: t.createProject.story,
             whatsapp: t.createProject.whatsapp,
             whatsappHint: t.createProject.whatsappHint,
+            location: t.createProject.location,
+            locationHint: t.createProject.locationHint,
+            detectLocation: t.createProject.detectLocation,
+            detecting: t.createProject.detecting,
             designStyle: t.createProject.designStyle,
             livePreview: t.createProject.livePreview,
             updatesInstantly: t.createProject.updatesInstantly,
